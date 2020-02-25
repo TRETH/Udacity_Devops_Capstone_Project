@@ -1,0 +1,21 @@
+pipeline {
+	agent any
+	stages {
+
+		stage('Lint HTML') {
+			steps {
+				sh 'tidy -q -e *.html'
+			}
+		}
+
+		stage('Build Docker Image') {
+			steps {
+				withCredentials([usernamePassword(credentialsId: 'dockerHub', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]){
+					sh '''
+						docker build -t trog1/capstone:blue --build-arg IMAGE_ID="nginx:1.16.1" .
+					'''
+				}
+			}
+		}
+    }
+ }
