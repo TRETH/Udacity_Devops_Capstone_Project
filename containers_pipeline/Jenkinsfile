@@ -72,7 +72,7 @@ pipeline {
 
          stage('Create service for the cluster and redirect to blue') {
          			steps {
-         				withAWS(region:'us-east-1', credentials:'ecr_credentials') {
+         				withAWS(region:'eu-central-1', credentials:'eks_credentials') {
          					sh '''
          						sed  's/{{TARGET_ROLE}}/blue/g' service.yaml | kubectl apply -f -
          					'''
