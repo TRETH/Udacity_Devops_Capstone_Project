@@ -74,7 +74,7 @@ pipeline {
          			steps {
          				withAWS(region:'eu-central-1', credentials:'eks_credentials') {
          					sh '''
-         						sed  's/{{TARGET_ROLE}}/blue/g' service.yaml | kubectl apply -f -
+         						sed  's/{{TARGET_ROLE}}/blue/g' containers_pipeline/service.yaml | kubectl apply -f -
          					'''
          				}
          			}
