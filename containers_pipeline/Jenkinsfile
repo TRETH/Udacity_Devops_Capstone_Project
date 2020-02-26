@@ -70,7 +70,7 @@ pipeline {
                 			}
                 		}
 
-         stage('Create service for the cluster and redirect to blue') {
+         stage('Create service for cluster and redirect to blue') {
          			steps {
          				withAWS(region:'eu-central-1', credentials:'eks_credentials') {
          					sh '''
@@ -80,6 +80,26 @@ pipeline {
          			}
          		}
 
+         stage('Deploy green containers for green environment') {
+                         			steps {
+                         				withAWS(region:'eu-central-1', credentials:'eks_credentials') {
+                         					sh '''
+                         						sed -e 's/{{TARGET_ROLE}}/green/g' -e 's/{{IMAGE_VERSION}}/green/' containers_pipeline/deployment.yaml | kubectl apply -f -
+                         					'''
+                         				}
+                         			}
+                         		}
+
+        stage('Create service to test green') {
+                 			steps {
+                 				withAWS(region:'eu-central-1', credentials:'eks_credentials') {
+                 					sh '''
+                 						sed  's/{{TARGET_ROLE}}/green/g' containers_pipeline/service-test.yaml | kubectl apply -f -
+                 					'''
+                 				}
+                 			}
+                 		}
+
 
 
         stage('Wait for user approval') {
@@ -87,5 +107,15 @@ pipeline {
                       input "Are you ready to redirect traffic to green environment?"
               }
          }
+
+        stage('Update service for cluster and redirect to green') {
+                 			steps {
+                 				withAWS(region:'eu-central-1', credentials:'eks_credentials') {
+                 					sh '''
+                 						sed  's/{{TARGET_ROLE}}/green/g' containers_pipeline/service.yaml | kubectl apply -f -
+                 					'''
+                 				}
+                 			}
+                 		}
     }
  }
