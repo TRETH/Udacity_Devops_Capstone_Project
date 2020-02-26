@@ -29,15 +29,21 @@ pipeline {
         }
 
         stage('Push Image To Dockerhub') {
-        			steps {
-        				withCredentials([usernamePassword(credentialsId: 'dockerHub', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]){
-        					sh '''
-        						docker login -u $USERNAME -p $PASSWORD
-        						docker push trog1/capstone:blue
-        						docker push trog1/capstone:green
+        	steps {
+        			withCredentials([usernamePassword(credentialsId: 'dockerHub', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]){
+        				sh '''
+        					docker login -u $USERNAME -p $PASSWORD
+        					docker push trog1/capstone:blue
+        					docker push trog1/capstone:green
         					'''
-        				}
-        			}
         		}
+        	}
+        }
+
+        stage('Wait for user approval') {
+             steps {
+                      input "Are you ready to redirect traffic to green environment?"
+              }
+         }
     }
  }
