@@ -40,6 +40,16 @@ pipeline {
         	}
         }
 
+        stage('Set current kubectl context') {
+        			steps {
+        				withAWS(region:'eu-central-1', credentials:'eks_credentials') {
+        					sh '''
+        						kubectl config use-context arn:aws:eks:eu-central-1:672849960683:cluster/capstoneCluster
+        					'''
+        				}
+        			}
+        		}
+
         stage('Wait for user approval') {
              steps {
                       input "Are you ready to redirect traffic to green environment?"
