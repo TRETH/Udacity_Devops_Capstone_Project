@@ -60,6 +60,16 @@ pipeline {
         			}
         		}
 
+        stage('Deploy blue containers for green environment') {
+                			steps {
+                				withAWS(region:'eu-central-1', credentials:'eks_credentials') {
+                					sh '''
+                						sed -e 's/{{TARGET_ROLE}}/green/g' -e 's/{{IMAGE_VERSION}}/blue/' containers_pipeline/deployment.yaml | kubectl apply -f -
+                					'''
+                				}
+                			}
+                		}
+
 
 
         stage('Wait for user approval') {
