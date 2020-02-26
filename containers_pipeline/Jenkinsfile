@@ -10,19 +10,31 @@ pipeline {
 
 		stage('Build Docker Image Blue Deployment') {
 			steps {
-				withCredentials([usernamePassword(credentialsId: 'dockerHub', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]){
-					sh '''
-						docker build -t trog1/capstone:blue --build-arg IMAGE_ID="nginx:1.16.1" containers_pipeline/
-					'''
+				    withCredentials([usernamePassword(credentialsId: 'dockerHub', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]){
+					    sh '''
+					    	docker build -t trog1/capstone:blue --build-arg IMAGE_ID="nginx:1.16.1" containers_pipeline/
+					    '''
 				}
 			}
 		}
 
 		stage('Build Docker Image Green Deployment') {
+        	steps {
+        			withCredentials([usernamePassword(credentialsId: 'dockerHub', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]){
+        				sh '''
+        					docker build -t trog1/capstone:green --build-arg IMAGE_ID="nginx:1.17.8" containers_pipeline/
+        				'''
+        		}
+        	}
+        }
+
+        stage('Push Image To Dockerhub') {
         			steps {
         				withCredentials([usernamePassword(credentialsId: 'dockerHub', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]){
         					sh '''
-        						docker build -t trog1/capstone:green --build-arg IMAGE_ID="nginx:1.17.8" containers_pipeline/
+        						docker login -u $USERNAME -p $PASSWORD
+        						docker push trog1/capstone:blue
+        						docker push trog1/capstone:green
         					'''
         				}
         			}
